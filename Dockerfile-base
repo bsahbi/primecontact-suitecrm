@@ -1,0 +1,42 @@
+# Dockerfile
+FROM mcr.microsoft.com/devcontainers/php:8.1
+
+# Update apt cache
+RUN apt-get update
+
+# Install required system packages
+RUN apt-get install -y \
+    git unzip zip curl \
+    libicu-dev libxml2-dev libpng-dev libonig-dev libzip-dev libpq-dev \
+    libfreetype6-dev libldap2-dev libjpeg-dev libxpm-dev libwebp-dev \
+    libkrb5-dev libssl-dev libxslt-dev libtidy-dev
+
+# Configure PHP extensions before building them
+RUN docker-php-ext-configure ldap \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp
+
+# Build and install PHP extensions
+RUN docker-php-ext-install -j$(nproc) \
+    pdo pdo_mysql mysqli zip intl gd xml ldap xsl tidy
+
+# Clean up apt cache to reduce image size
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Set Git safe directory
+RUN git config --global --add safe.directory /var/www/html
+
+# Set environment variables
+ENV APP_ENV=prod
+ENV APP_DEBUG=1   
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
+
+# Install Node.js (v18 LTS includes Corepack) and Yarn
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs 
+
+# RUN npm install -g --force yarn@1.22.19
+
+# Set working directory
+WORKDIR /var/www/html

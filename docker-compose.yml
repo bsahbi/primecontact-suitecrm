@@ -6,10 +6,11 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: suitecrm-app
+    user: "www-data:www-data"
     ports:
       - "8080:80"
-    volumes:
-      - .:/var/www/html
+    # volumes:
+    #   - .:/var/www/html
     depends_on:
       - db
     environment:
