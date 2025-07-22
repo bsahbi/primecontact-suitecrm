@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   suitecrm:
@@ -9,8 +8,11 @@ services:
     user: "www-data:www-data"
     ports:
       - "8080:80"
-    # volumes:
-    #   - .:/var/www/html
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh
+    # - ./apache-servername.conf:/etc/apache2/conf-available/servername.conf
+    # - .:/var/www/html
+    entrypoint: ["/entrypoint.sh"]
     depends_on:
       - db
     environment:

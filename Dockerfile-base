@@ -9,7 +9,8 @@ RUN apt-get install -y \
     git unzip zip curl \
     libicu-dev libxml2-dev libpng-dev libonig-dev libzip-dev libpq-dev \
     libfreetype6-dev libldap2-dev libjpeg-dev libxpm-dev libwebp-dev \
-    libkrb5-dev libssl-dev libxslt-dev libtidy-dev
+    libkrb5-dev libssl-dev libxslt-dev libtidy-dev \
+    mariadb-client
 
 # Configure PHP extensions before building them
 RUN docker-php-ext-configure ldap \
@@ -37,6 +38,13 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs 
 
 # RUN npm install -g --force yarn@1.22.19
+RUN corepack enable && corepack prepare yarn@4.5.1 --activate
+
 
 # Set working directory
 WORKDIR /var/www/html
+
+COPY package.json package.json
+
+RUN yarn install
+
